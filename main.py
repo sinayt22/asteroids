@@ -28,7 +28,7 @@ def main():
     Score.containers = drawable
 
     asteroid_field = AsteroidField()
-    score = Score(screen)
+    score = Score("orange", 36, "Arial")
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
     while True:

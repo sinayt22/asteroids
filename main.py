@@ -5,6 +5,7 @@ from asteroidfield import AsteroidField
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from logger import log_state, log_event
 from player import Player
+from player_health_text import PlayerHealthText
 from score import Score
 from shot import Shot
 
@@ -26,10 +27,12 @@ def main():
     Shot.containers = (shots, updatable, drawable)
     Player.containers = (updatable, drawable)
     Score.containers = drawable
+    PlayerHealthText.containers = drawable
 
     asteroid_field = AsteroidField()
     score = Score("orange", 36, "Arial")
-    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 3)
+    player_health = PlayerHealthText("red", 36, player, "Arial")
 
     while True:
         log_state()
@@ -46,8 +49,8 @@ def main():
         for asteroid in asteroids:
             if asteroid.collide_with(player):
                 log_event("player_hit")
-                print("Game Over!")
-                sys.exit()
+                player.lose_life()
+                asteroid.split()
 
             for shot in shots:
                 if asteroid.collide_with(shot):

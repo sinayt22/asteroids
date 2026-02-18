@@ -1,3 +1,4 @@
+import sys
 import pygame
 from constants import (
     PLAYER_RADIUS,
@@ -13,10 +14,11 @@ from shot import Shot
 
 
 class Player(CircleShape):
-    def __init__(self, x, y):
+    def __init__(self, x, y, lives):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.timer = 0
+        self.lives = lives
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -31,6 +33,12 @@ class Player(CircleShape):
 
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
+
+    def lose_life(self):
+        self.lives -= 1
+        if self.lives <= 0:
+            print("Game Over!")
+            sys.exit()
 
     def move(self, dt):
         unit_vector = pygame.Vector2(0, 1)

@@ -3,6 +3,7 @@ import pygame
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from explosion import Explosion
 from logger import log_state, log_event
 from player import Player
 from player_health_text import PlayerHealthText
@@ -28,6 +29,7 @@ def main():
     Player.containers = (updatable, drawable)
     Score.containers = drawable
     PlayerHealthText.containers = drawable
+    Explosion.containers = (updatable, drawable)
 
     asteroid_field = AsteroidField()
     score = Score("orange", 36, "Arial")

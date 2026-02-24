@@ -10,6 +10,7 @@ from constants import (
     SHOT_RADIUS,
 )
 from circleshape import CircleShape
+from game_text import GameText
 from shot import Shot
 
 
@@ -19,6 +20,10 @@ class Player(CircleShape):
         self.rotation = 0
         self.timer = 0
         self.lives = lives
+        self.acceleration = 1
+        self.max_acceleration = 3
+        self.was_accelerating = False
+        self.acceleration_text = GameText("red", 20)
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -30,6 +35,14 @@ class Player(CircleShape):
 
     def draw(self, screen):
         pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
+
+        text_image = self.acceleration_text.font.render(
+            f"acc: {self.acceleration:.2f}", True, self.acceleration_text.color
+        )
+        rect = text_image.get_rect(
+            topleft=(self.position.x - 100, self.position.y - 20)
+        )
+        screen.blit(text_image, rect)
 
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
@@ -43,12 +56,29 @@ class Player(CircleShape):
     def move(self, dt):
         unit_vector = pygame.Vector2(0, 1)
         rotated_vector = unit_vector.rotate(self.rotation)
-        rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
+        rotated_with_speed_vector = (
+            rotated_vector * PLAYER_SPEED * dt * self.acceleration
+        )
         self.position += rotated_with_speed_vector
+
+    def change_acceleration(self, dt):
+        keys = pygame.key.get_pressed()
+        if (keys[pygame.K_w] and keys[pygame.K_s]) or not keys[pygame.K_w]:
+            self.acceleration = 1
+        elif keys[pygame.K_w] and self.was_accelerating:
+            self.acceleration = min(
+                self.max_acceleration, self.acceleration + (2.5 * dt)
+            )
+
+        if keys[pygame.K_w]:
+            self.was_accelerating = True
+        else:
+            self.was_accelerating = False
 
     def update(self, dt):
         self.timer -= dt
         keys = pygame.key.get_pressed()
+        self.change_acceleration(dt)
 
         if keys[pygame.K_a]:
             self.rotate(-dt)

@@ -9,8 +9,8 @@ class GameText(pygame.sprite.Sprite):
             super().__init__()
         self.color = color
         self.font_size = font_size
-        self.font = font
-        self.font = pygame.font.SysFont(self.font, self.font_size)
+        self.font = font if font else "Arial"
+        self.font = pygame.font.SysFont(self.font, self.font_size, self.font)
 
     def draw(self, screen):
         pass

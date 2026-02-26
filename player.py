@@ -33,16 +33,49 @@ class Player(CircleShape):
         c = self.position - forward * self.radius + right
         return [a, b, c]
 
+    def jet_triangle(self, scale_vertical, scale_horizontaly):
+        backward = pygame.Vector2(0, 1).rotate(self.rotation + 180)
+        right = (
+            pygame.Vector2(0, 1).rotate(self.rotation + 90)
+            * self.radius
+            * scale_horizontaly
+        )
+
+        tip = self.position + (backward * self.radius * scale_vertical)
+        base_center = self.position + backward * self.radius
+        left_point = base_center - right
+        right_point = base_center + right
+        return [tip, left_point, right_point]
+
     def draw(self, screen):
         pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
 
+        self.draw_player_text(screen)
+        self.draw_player_movement(screen)
+
+    def draw_player_text(self, screen):
         text_image = self.acceleration_text.font.render(
             f"acc: {self.acceleration:.2f}", True, self.acceleration_text.color
         )
         rect = text_image.get_rect(
             topleft=(self.position.x - 100, self.position.y - 20)
         )
+
         screen.blit(text_image, rect)
+
+    def draw_player_movement(self, screen):
+        if not self.was_accelerating:
+            return
+        jet_triangle_large = self.jet_triangle(
+            scale_vertical=2, scale_horizontaly=1 / 2
+        )
+        pygame.draw.polygon(screen, "orange", jet_triangle_large, 0)
+
+        if self.acceleration > 2.5:
+            jet_triangle_small = self.jet_triangle(
+                scale_vertical=1.5, scale_horizontaly=1 / 3
+            )
+            pygame.draw.polygon(screen, "red", jet_triangle_small, 0)
 
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt

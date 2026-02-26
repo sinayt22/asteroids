@@ -7,14 +7,14 @@ from constants import (
     PLAYER_SHOOT_SPEED,
     PLAYER_SPEED,
     PLAYER_TURN_SPEED,
-    SHOT_RADIUS,
 )
 from circleshape import CircleShape
 from game_text import GameText
+from screen_wrapper import ScreenWrapper
 from shot import Shot
 
 
-class Player(CircleShape):
+class Player(CircleShape, ScreenWrapper):
     def __init__(self, x, y, lives):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
@@ -109,6 +109,7 @@ class Player(CircleShape):
             self.was_accelerating = False
 
     def update(self, dt):
+        self.wrap_position()
         self.timer -= dt
         keys = pygame.key.get_pressed()
         self.change_acceleration(dt)

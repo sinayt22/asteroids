@@ -4,9 +4,10 @@ from circleshape import CircleShape
 from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH
 from explosion import Explosion
 from logger import log_event
+from screen_wrapper import ScreenWrapper
 
 
-class Asteroid(CircleShape):
+class Asteroid(CircleShape, ScreenWrapper):
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
 
@@ -14,6 +15,7 @@ class Asteroid(CircleShape):
         pygame.draw.circle(screen, "white", self.position, self.radius, LINE_WIDTH)
 
     def update(self, dt):
+        self.wrap_position()
         self.position += self.velocity * dt
 
     def add_explosion(self):

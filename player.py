@@ -24,6 +24,10 @@ class Player(CircleShape, ScreenWrapper):
         self.max_acceleration = 3
         self.was_accelerating = False
         self.acceleration_text = GameText("red", 20)
+        self.image = pygame.image.load("starship.png").convert_alpha()
+        self.image = pygame.transform.scale(
+            self.image, (self.radius * 2, self.radius * 2)
+        )
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -49,7 +53,9 @@ class Player(CircleShape, ScreenWrapper):
 
     def draw(self, screen):
         pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
-
+        rotated_image = pygame.transform.rotate(self.image, -self.rotation + 180)
+        rect = rotated_image.get_rect(center=self.position)
+        screen.blit(rotated_image, rect)
         self.draw_player_text(screen)
         self.draw_player_movement(screen)
 

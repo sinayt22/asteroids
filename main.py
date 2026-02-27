@@ -14,6 +14,10 @@ from shot import Shot
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    background_image = pygame.image.load("stars.png").convert()
+    background_image = pygame.transform.scale(
+        background_image, (SCREEN_WIDTH, SCREEN_HEIGHT)
+    )
 
     clock = pygame.time.Clock()
     dt = 0
@@ -43,7 +47,8 @@ def main():
             if event.type == pygame.QUIT:
                 return
 
-        screen.fill("black")
+        # screen.fill("black")
+        screen.blit(background_image, (0, 0))
 
         for u in updatable:
             u.update(dt)

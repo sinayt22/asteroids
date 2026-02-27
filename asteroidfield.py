@@ -28,13 +28,25 @@ class AsteroidField(pygame.sprite.Sprite):
         ],
     ]
 
-    def __init__(self):
+    def __init__(self, asteroid_group, max_asteroids):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.spawn_timer = 0.0
+        self.asteroid_group = asteroid_group
+        self.max_asteroids = max_asteroids
+        self.asteroid_count_text = pygame.font.SysFont(None, 36)
 
     def spawn(self, radius, position, velocity):
+        if len(self.asteroid_group) >= self.max_asteroids:
+            return
         asteroid = Asteroid(position.x, position.y, radius)
         asteroid.velocity = velocity
+
+    def draw(self, screen):
+        image_text = self.asteroid_count_text.render(
+            f"# Asteroids: {len(self.asteroid_group)}", True, "orange"
+        )
+        rect = image_text.get_rect(topleft=(30, 60))
+        screen.blit(image_text, rect)
 
     def update(self, dt):
         self.spawn_timer += dt

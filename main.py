@@ -24,14 +24,14 @@ def main():
     shots = pygame.sprite.Group()
 
     Asteroid.containers = (asteroids, drawable, updatable)
-    AsteroidField.containers = updatable
+    AsteroidField.containers = (updatable, drawable)
     Shot.containers = (shots, updatable, drawable)
     Player.containers = (updatable, drawable)
     Score.containers = drawable
     PlayerHealthText.containers = drawable
     Explosion.containers = (updatable, drawable)
 
-    asteroid_field = AsteroidField()
+    asteroid_field = AsteroidField(asteroids, 30)
     score = Score("orange", 36, "Arial")
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 3)
     player_health = PlayerHealthText("red", 36, player, "Arial")

@@ -11,7 +11,7 @@ from constants import (
 from circleshape import CircleShape
 from game_text import GameText
 from screen_wrapper import ScreenWrapper
-from shot import Shot, TripleShot
+from shot import Shot, SuperShot, TripleShot
 
 
 class Player(CircleShape, ScreenWrapper):
@@ -134,4 +134,4 @@ class Player(CircleShape, ScreenWrapper):
         if self.timer > 0:
             return
         self.timer = PLAYER_SHOOT_COOLDOWN_SECONDS
-        shot = TripleShot(self.position.x, self.position.y, self.rotation)
+        shot = SuperShot(self.position.x, self.position.y, self.rotation)

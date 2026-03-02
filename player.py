@@ -11,7 +11,7 @@ from constants import (
 from circleshape import CircleShape
 from game_text import GameText
 from screen_wrapper import ScreenWrapper
-from shot import Shot
+from shot import Shot, TripleShot
 
 
 class Player(CircleShape, ScreenWrapper):
@@ -52,7 +52,6 @@ class Player(CircleShape, ScreenWrapper):
         return [tip, left_point, right_point]
 
     def draw(self, screen):
-        pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
         rotated_image = pygame.transform.rotate(self.image, -self.rotation + 180)
         rect = rotated_image.get_rect(center=self.position)
         screen.blit(rotated_image, rect)
@@ -135,4 +134,4 @@ class Player(CircleShape, ScreenWrapper):
         if self.timer > 0:
             return
         self.timer = PLAYER_SHOOT_COOLDOWN_SECONDS
-        shot = Shot(self.position.x, self.position.y, self.rotation)
+        shot = TripleShot(self.position.x, self.position.y, self.rotation)

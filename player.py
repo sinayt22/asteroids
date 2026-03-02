@@ -135,5 +135,4 @@ class Player(CircleShape, ScreenWrapper):
         if self.timer > 0:
             return
         self.timer = PLAYER_SHOOT_COOLDOWN_SECONDS
-        shot = Shot(self.position.x, self.position.y)
-        shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
+        shot = Shot(self.position.x, self.position.y, self.rotation)

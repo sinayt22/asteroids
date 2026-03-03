@@ -48,3 +48,4 @@ class SuperShot(Shot):
         super().update(dt)
         if self.time_to_live - dt <= 0:
             super().kill()
+

@@ -1,5 +1,6 @@
 import sys
 import pygame
+from bomb import Bomb
 from constants import (
     PLAYER_RADIUS,
     LINE_WIDTH,
@@ -129,9 +130,17 @@ class Player(CircleShape, ScreenWrapper):
             self.move(-dt)
         if keys[pygame.K_SPACE]:
             self.shoot()
+        if keys[pygame.K_LCTRL]:
+            self.bomb()
 
     def shoot(self):
         if self.timer > 0:
             return
         self.timer = PLAYER_SHOOT_COOLDOWN_SECONDS
         shot = SuperShot(self.position.x, self.position.y, self.rotation)
+
+    def bomb(self):
+        if self.timer > 0:
+            return
+        self.timer = PLAYER_SHOOT_COOLDOWN_SECONDS
+        Bomb(self.position.x, self.position.y)

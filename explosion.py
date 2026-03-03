@@ -4,12 +4,13 @@ from circleshape import CircleShape
 
 
 class Explosion(CircleShape):
-    def __init__(self, x, y, radius):
+    def __init__(self, x, y, radius, lifespan=1, radius_growth=5):
         super().__init__(x, y, radius)
         self.color = (255, 255, 0)
         self.alpha = 255
-        self.max_lifespan = 1
+        self.max_lifespan = lifespan
         self.current_lifespan = self.max_lifespan
+        self.radius_growth_rate = radius_growth
 
     def draw(self, screen):
         size = int(self.radius * 2)
@@ -31,7 +32,7 @@ class Explosion(CircleShape):
             self.kill()
             return
 
-        self.radius += 5 * dt
+        self.radius += self.radius_growth_rate * dt
 
         progress = 1 - (self.current_lifespan / self.max_lifespan)
         if progress < 0.3:

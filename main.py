@@ -2,6 +2,7 @@ import sys
 import pygame
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
+from bomb import Bomb
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from explosion import Explosion
 from logger import log_state, log_event
@@ -26,10 +27,12 @@ def main():
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
+    bombs = pygame.sprite.Group()
 
     Asteroid.containers = (asteroids, drawable, updatable)
     AsteroidField.containers = (updatable, drawable)
     Shot.containers = (shots, updatable, drawable)
+    Bomb.containers = (bombs, updatable, drawable)
     Player.containers = (updatable, drawable)
     Score.containers = drawable
     PlayerHealthText.containers = drawable
@@ -65,6 +68,12 @@ def main():
                     score.update_score(10)
                     asteroid.split()
                     shot.kill()
+            
+            for bomb in bombs:
+                if asteroid.collide_with(bomb):
+                    log_event("asteroid_bombed")
+                    score.update_score(10)
+                    asteroid.split()
 
         for d in drawable:
             d.draw(screen)

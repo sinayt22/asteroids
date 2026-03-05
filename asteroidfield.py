@@ -2,6 +2,7 @@ import pygame
 import random
 from asteroid import Asteroid
 from constants import *
+from pickup import SuperShotPickup, TripleShotPickup
 
 
 class AsteroidField(pygame.sprite.Sprite):
@@ -28,18 +29,30 @@ class AsteroidField(pygame.sprite.Sprite):
         ],
     ]
 
-    def __init__(self, asteroid_group, max_asteroids):
+    def __init__(self, asteroid_group, max_asteroids, pickup_group):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.spawn_timer = 0.0
+        self.pickup_spawn_timer = 0.0
+        self.pickup_group = pickup_group
         self.asteroid_group = asteroid_group
         self.max_asteroids = max_asteroids
+        self.max_pickups = 1
         self.asteroid_count_text = pygame.font.SysFont(None, 36)
+        self.pickupables = {"triple": TripleShotPickup, "super": SuperShotPickup}
 
     def spawn(self, radius, position, velocity):
         if len(self.asteroid_group) >= self.max_asteroids:
             return
         asteroid = Asteroid(position.x, position.y, radius)
         asteroid.velocity = velocity
+
+    def spawn_pickup(self):
+        if len(self.pickup_group) >= self.max_pickups:
+            return
+        x = random.randint(100, SCREEN_WIDTH - 100)
+        y = random.randint(100, SCREEN_HEIGHT - 100)
+        pickup_type = self.pickupables[random.choice(list(self.pickupables))]
+        pickup_type(x, y)
 
     def draw(self, screen):
         image_text = self.asteroid_count_text.render(
@@ -50,6 +63,7 @@ class AsteroidField(pygame.sprite.Sprite):
 
     def update(self, dt):
         self.spawn_timer += dt
+        self.pickup_spawn_timer += dt
         if self.spawn_timer > ASTEROID_SPAWN_RATE_SECONDS:
             self.spawn_timer = 0
 
@@ -61,3 +75,7 @@ class AsteroidField(pygame.sprite.Sprite):
             position = edge[1](random.uniform(0, 1))
             kind = random.randint(1, ASTEROID_KINDS)
             self.spawn(ASTEROID_MIN_RADIUS * kind, position, velocity)
+        
+        if self.pickup_spawn_timer > PICKUP_SPAWN_RATE_SECONDS:
+            self.pickup_spawn_timer = 0
+            self.spawn_pickup()

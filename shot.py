@@ -10,8 +10,9 @@ class Shot(CircleShape):
         self.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
         size = int(self.radius * 2)
         self.texture = pygame.image.load(image_path).convert_alpha()
-        self.texture = pygame.transform.scale(self.texture, (size, size))
+        self.texture = pygame.transform.scale(self.texture, (size * 2, size * 2))
         self.texture = pygame.transform.rotate(self.texture, -self.rotation + 90)
+        
 
     def draw(self, screen):
         temp_surface = self.texture.get_rect(center=self.position)

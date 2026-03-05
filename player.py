@@ -6,11 +6,13 @@ from constants import (
     LINE_WIDTH,
     PLAYER_SHOOT_COOLDOWN_SECONDS,
     PLAYER_SHOOT_SPEED,
+    PLAYER_SHOOTING_MAX_TIME,
     PLAYER_SPEED,
     PLAYER_TURN_SPEED,
 )
 from circleshape import CircleShape
 from game_text import GameText
+from pickup import SuperShotPickup, TripleShotPickup
 from screen_wrapper import ScreenWrapper
 from shot import Shot, SuperShot, TripleShot
 
@@ -29,6 +31,8 @@ class Player(CircleShape, ScreenWrapper):
         self.image = pygame.transform.scale(
             self.image, (self.radius * 2, self.radius * 2)
         )
+        self.shot_type = Shot
+        self.shot_timer = PLAYER_SHOOTING_MAX_TIME
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -117,6 +121,7 @@ class Player(CircleShape, ScreenWrapper):
     def update(self, dt):
         self.wrap_position()
         self.timer -= dt
+        self.shot_timer -= dt
         keys = pygame.key.get_pressed()
         self.change_acceleration(dt)
 
@@ -137,10 +142,20 @@ class Player(CircleShape, ScreenWrapper):
         if self.timer > 0:
             return
         self.timer = PLAYER_SHOOT_COOLDOWN_SECONDS
-        shot = SuperShot(self.position.x, self.position.y, self.rotation)
+        if self.shot_timer <= 0:
+            self.shot_type = Shot
+        self.shot_type(self.position.x, self.position.y, self.rotation)
+        
 
     def bomb(self):
         if self.timer > 0:
             return
         self.timer = PLAYER_SHOOT_COOLDOWN_SECONDS
         Bomb(self.position.x, self.position.y)
+
+    def gain_pickup(self, pickup):
+        self.shot_timer = PLAYER_SHOOTING_MAX_TIME
+        if type(pickup) == TripleShotPickup:
+            self.shot_type = TripleShot
+        elif type(pickup) == SuperShotPickup:
+            self.shot_type = SuperShot

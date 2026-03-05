@@ -6,10 +6,18 @@ from bomb import Bomb
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from explosion import Explosion
 from logger import log_state, log_event
+from pickup import Pickup
 from player import Player
 from player_health_text import PlayerHealthText
 from score import Score
 from shot import Shot
+from utils import create_super_shot_icon, create_triple_shot_icon
+
+def setup_icons():
+    icon = create_triple_shot_icon()
+    pygame.image.save(icon, "triple_shot_pickup.png")
+    icon = create_super_shot_icon()
+    pygame.image.save(icon, "super_shot_pickup.png")
 
 
 def main():
@@ -19,7 +27,7 @@ def main():
     background_image = pygame.transform.scale(
         background_image, (SCREEN_WIDTH, SCREEN_HEIGHT)
     )
-
+   
     clock = pygame.time.Clock()
     dt = 0
 
@@ -28,6 +36,7 @@ def main():
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
     bombs = pygame.sprite.Group()
+    pickups = pygame.sprite.Group()
 
     Asteroid.containers = (asteroids, drawable, updatable)
     AsteroidField.containers = (updatable, drawable)
@@ -37,8 +46,9 @@ def main():
     Score.containers = drawable
     PlayerHealthText.containers = drawable
     Explosion.containers = (updatable, drawable)
+    Pickup.containers = (pickups, updatable, drawable)
 
-    asteroid_field = AsteroidField(asteroids, 30)
+    asteroid_field = AsteroidField(asteroids, 30, pickups)
     score = Score("orange", 36, "Arial")
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 3)
     player_health = PlayerHealthText("red", 36, player, "Arial")
@@ -74,6 +84,11 @@ def main():
                     log_event("asteroid_bombed")
                     score.update_score(10)
                     asteroid.split()
+            
+            for pickup in pickups:
+                if player.collide_with(pickup):
+                    pickup.kill()
+                    player.gain_pickup(pickup)
 
         for d in drawable:
             d.draw(screen)

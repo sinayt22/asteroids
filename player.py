@@ -2,6 +2,8 @@ import sys
 import pygame
 from bomb import Bomb
 from constants import (
+    PLAYER_BOMB_COOLDOWN_SECONDS,
+    PLAYER_INITIAL_BOMB_COUNT,
     PLAYER_RADIUS,
     LINE_WIDTH,
     PLAYER_SHOOT_COOLDOWN_SECONDS,
@@ -9,10 +11,11 @@ from constants import (
     PLAYER_SHOOTING_MAX_TIME,
     PLAYER_SPEED,
     PLAYER_TURN_SPEED,
+    SCREEN_HEIGHT,
 )
 from circleshape import CircleShape
 from game_text import GameText
-from pickup import SuperShotPickup, TripleShotPickup
+from pickup import BombPickup, SuperShotPickup, TripleShotPickup
 from screen_wrapper import ScreenWrapper
 from shot import Shot, SuperShot, TripleShot
 
@@ -33,6 +36,10 @@ class Player(CircleShape, ScreenWrapper):
         )
         self.shot_type = Shot
         self.shot_timer = PLAYER_SHOOTING_MAX_TIME
+        self.bomb_timer = PLAYER_BOMB_COOLDOWN_SECONDS
+        self.num_bombs = PLAYER_INITIAL_BOMB_COUNT
+        self.bomb_image = pygame.image.load('bomb.png').convert_alpha()
+        self.bomb_image = pygame.transform.scale(self.bomb_image, (30, 30))
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -62,6 +69,12 @@ class Player(CircleShape, ScreenWrapper):
         screen.blit(rotated_image, rect)
         self.draw_player_text(screen)
         self.draw_player_movement(screen)
+        self.draw_bombs(screen)
+
+    def draw_bombs(self, screen):
+        for i in range(self.num_bombs):
+            rect = self.bomb_image.get_rect(bottomleft=(30 * i, SCREEN_HEIGHT - 10))
+            screen.blit(self.bomb_image, rect)
 
     def draw_player_text(self, screen):
         text_image = self.acceleration_text.font.render(
@@ -122,6 +135,7 @@ class Player(CircleShape, ScreenWrapper):
         self.wrap_position()
         self.timer -= dt
         self.shot_timer -= dt
+        self.bomb_timer -= dt
         keys = pygame.key.get_pressed()
         self.change_acceleration(dt)
 
@@ -148,9 +162,11 @@ class Player(CircleShape, ScreenWrapper):
         
 
     def bomb(self):
-        if self.timer > 0:
+        if self.bomb_timer > 0 or self.num_bombs <= 0:
             return
-        self.timer = PLAYER_SHOOT_COOLDOWN_SECONDS
+
+        self.num_bombs -= 1
+        self.bomb_timer = PLAYER_BOMB_COOLDOWN_SECONDS
         Bomb(self.position.x, self.position.y)
 
     def gain_pickup(self, pickup):
@@ -159,3 +175,5 @@ class Player(CircleShape, ScreenWrapper):
             self.shot_type = TripleShot
         elif type(pickup) == SuperShotPickup:
             self.shot_type = SuperShot
+        elif type(pickup) == BombPickup:
+            self.num_bombs += 1

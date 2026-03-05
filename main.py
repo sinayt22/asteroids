@@ -3,7 +3,7 @@ import pygame
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from bomb import Bomb
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from constants import PLAYER_HEALTH, SCREEN_WIDTH, SCREEN_HEIGHT
 from explosion import Explosion
 from logger import log_state, log_event
 from pickup import Pickup
@@ -50,7 +50,7 @@ def main():
 
     asteroid_field = AsteroidField(asteroids, 30, pickups)
     score = Score("orange", 36, "Arial")
-    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 3)
+    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, PLAYER_HEALTH)
     player_health = PlayerHealthText("red", 36, player, "Arial")
 
     while True:

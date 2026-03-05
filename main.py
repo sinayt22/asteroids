@@ -67,10 +67,11 @@ def main():
             u.update(dt)
 
         for asteroid in asteroids:
-            if asteroid.collide_with(player):
-                log_event("player_hit")
-                player.lose_life()
+            if player.collide_with(asteroid):
                 asteroid.split()
+                if not player.is_shield_active:
+                    log_event("player_hit")
+                    player.lose_life()
 
             for shot in shots:
                 if asteroid.collide_with(shot):

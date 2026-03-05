@@ -6,6 +6,7 @@ from constants import (
     PLAYER_INITIAL_BOMB_COUNT,
     PLAYER_RADIUS,
     LINE_WIDTH,
+    PLAYER_SHIELD_ACTIVE_SECONDS,
     PLAYER_SHOOT_COOLDOWN_SECONDS,
     PLAYER_SHOOT_SPEED,
     PLAYER_SHOOTING_MAX_TIME,
@@ -15,7 +16,7 @@ from constants import (
 )
 from circleshape import CircleShape
 from game_text import GameText
-from pickup import BombPickup, SuperShotPickup, TripleShotPickup
+from pickup import BombPickup, ShieldPickup, SuperShotPickup, TripleShotPickup
 from screen_wrapper import ScreenWrapper
 from shot import Shot, SuperShot, TripleShot
 
@@ -37,9 +38,13 @@ class Player(CircleShape, ScreenWrapper):
         self.shot_type = Shot
         self.shot_timer = PLAYER_SHOOTING_MAX_TIME
         self.bomb_timer = PLAYER_BOMB_COOLDOWN_SECONDS
+        self.shield_timer = PLAYER_SHIELD_ACTIVE_SECONDS
         self.num_bombs = PLAYER_INITIAL_BOMB_COUNT
-        self.bomb_image = pygame.image.load('bomb.png').convert_alpha()
+        self.bomb_image = pygame.image.load('bomb_pickup.png').convert_alpha()
         self.bomb_image = pygame.transform.scale(self.bomb_image, (30, 30))
+        self.is_shield_active = True
+        self.shield_radius = self.radius * 2
+        self.shield_text = pygame.font.SysFont("arial", 24)
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -67,16 +72,21 @@ class Player(CircleShape, ScreenWrapper):
         rotated_image = pygame.transform.rotate(self.image, -self.rotation + 180)
         rect = rotated_image.get_rect(center=self.position)
         screen.blit(rotated_image, rect)
-        self.draw_player_text(screen)
+        # self.draw_player_debug_text(screen)
         self.draw_player_movement(screen)
         self.draw_bombs(screen)
+        if self.is_shield_active:
+            pygame.draw.circle(screen, "blue", self.position, self.shield_radius, LINE_WIDTH)
+            text_image = self.shield_text.render(f"Time left for shield: {self.shield_timer:.2f}", True, "Blue")
+            rect = text_image.get_rect(topleft=(30, 100))
+            screen.blit(text_image, rect)
 
     def draw_bombs(self, screen):
         for i in range(self.num_bombs):
             rect = self.bomb_image.get_rect(bottomleft=(30 * i, SCREEN_HEIGHT - 10))
             screen.blit(self.bomb_image, rect)
 
-    def draw_player_text(self, screen):
+    def draw_player_debug_text(self, screen):
         text_image = self.acceleration_text.font.render(
             f"acc: {self.acceleration:.2f}", True, self.acceleration_text.color
         )
@@ -136,6 +146,11 @@ class Player(CircleShape, ScreenWrapper):
         self.timer -= dt
         self.shot_timer -= dt
         self.bomb_timer -= dt
+        self.shield_timer -= dt
+
+        if self.shield_timer <= 0:
+            self.is_shield_active = False
+
         keys = pygame.key.get_pressed()
         self.change_acceleration(dt)
 
@@ -177,3 +192,12 @@ class Player(CircleShape, ScreenWrapper):
             self.shot_type = SuperShot
         elif type(pickup) == BombPickup:
             self.num_bombs += 1
+        elif type(pickup) == ShieldPickup:
+            self.is_shield_active = True
+            self.shield_timer = PLAYER_SHIELD_ACTIVE_SECONDS
+    
+    def collide_with(self, other):
+        if self.is_shield_active:
+            distance = self.position.distance_to(other.position)
+            return self.shield_radius + other.radius >= distance
+        return super().collide_with(other)

@@ -34,4 +34,8 @@ class SuperShotPickup(Pickup):
 
 class BombPickup(Pickup):
     def __init__(self, x, y, radius=30):
-        super().__init__(x, y, radius, 'bomb.png')
+        super().__init__(x, y, radius, 'bomb_pickup.png')
+
+class ShieldPickup(Pickup):
+    def __init__(self, x, y, radius=30):
+        super().__init__(x, y, radius, 'shield_pickup.png')

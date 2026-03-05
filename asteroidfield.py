@@ -2,7 +2,7 @@ import pygame
 import random
 from asteroid import Asteroid
 from constants import *
-from pickup import BombPickup, SuperShotPickup, TripleShotPickup
+from pickup import BombPickup, ShieldPickup, SuperShotPickup, TripleShotPickup
 
 
 class AsteroidField(pygame.sprite.Sprite):
@@ -38,7 +38,7 @@ class AsteroidField(pygame.sprite.Sprite):
         self.max_asteroids = max_asteroids
         self.max_pickups = 1
         self.asteroid_count_text = pygame.font.SysFont(None, 36)
-        self.pickupables = {"triple": TripleShotPickup, "super": SuperShotPickup, "bomb": BombPickup}
+        self.pickupables = {"triple": TripleShotPickup, "super": SuperShotPickup, "bomb": BombPickup, "shield": ShieldPickup}
 
     def spawn(self, radius, position, velocity):
         if len(self.asteroid_group) >= self.max_asteroids:
